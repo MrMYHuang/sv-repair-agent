@@ -8,7 +8,7 @@ module broken_counter (
     if (!rst_n) begin
       count <= 4'd0;
     end else begin
-      count <= count + 4'd1
+      count <= count + 4'd1;
     end
   end
 

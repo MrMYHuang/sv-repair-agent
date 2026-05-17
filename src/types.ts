@@ -24,5 +24,6 @@ export interface PiResult {
 
 export interface RepairPromptInput {
   filePath: string;
+  verilatorCommand: string;
   verilatorOutput: string;
 }

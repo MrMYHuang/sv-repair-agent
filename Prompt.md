@@ -21,27 +21,24 @@ CLI usage:
   sv-repair-agent --file path/to/top.sv
 
 Core workflow:
-1. Backup original file:
-   <file>.bak
-
-2. Run Verilator:
+1. Run Verilator:
    verilator --lint-only --sv <file>
 
-3. If Verilator passes:
+2. If Verilator passes:
    print "Syntax check PASS"
    exit 0
 
-4. If Verilator fails:
+3. If Verilator fails:
    capture stdout/stderr
    generate repair prompt
    invoke Pi Coding Agent through its SDK
    stream Pi assistant text deltas live to terminal
    re-run Verilator
 
-5. Maximum repair attempts:
+4. Maximum repair attempts:
    3
 
-6. If still failing after 3 attempts:
+5. If still failing after 3 attempts:
    print "Syntax check FAIL"
    print final Verilator errors
    exit 1
@@ -158,7 +155,7 @@ Rules:
 - Do not create unrelated files.
 - Do not rewrite the architecture unless required.
 - After editing, the file must pass:
-  verilator --lint-only --sv {{FILE_PATH}}
+  {{VERILATOR_COMMAND}}
 
 Verilator output:
 {{VERILATOR_ERROR}}
@@ -171,7 +168,6 @@ Implementation requirements:
 - Validate Pi SDK availability.
 - Validate required env vars.
 - Save final repaired file in-place.
-- Preserve backup file.
 - Exit code 0 only when syntax passes.
 - Exit code 1 otherwise.
 

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { buildRepairPrompt, runPiRepair } from './pi.js';
-import { runVerilator } from './verilator.js';
+import { buildVerilatorCommand, runVerilator } from './verilator.js';
 import type { AppConfig, VerilatorResult } from './types.js';
 import type { Logger } from './logger.js';
 
@@ -13,18 +13,11 @@ export async function runRepairLoop(
 ): Promise<number> {
   const absoluteFilePath = path.resolve(filePath);
   const workdir = path.dirname(absoluteFilePath);
-  const backupPath = `${absoluteFilePath}.bak`;
+  const verilatorCommand = buildVerilatorCommand(absoluteFilePath);
 
   if (!fs.existsSync(absoluteFilePath)) {
     logger.log(0, 'ERROR', `Target file does not exist: ${absoluteFilePath}`);
     return 1;
-  }
-
-  if (!fs.existsSync(backupPath)) {
-    fs.copyFileSync(absoluteFilePath, backupPath);
-    logger.log(0, 'INFO', `Backed up original file to ${backupPath}`);
-  } else {
-    logger.log(0, 'WARN', `Backup already exists, preserving it: ${backupPath}`);
   }
 
   let lastResult: VerilatorResult | undefined;
@@ -44,6 +37,7 @@ export async function runRepairLoop(
 
     const prompt = buildRepairPrompt({
       filePath: absoluteFilePath,
+      verilatorCommand,
       verilatorOutput: lastResult.output
     });
 
@@ -52,6 +46,9 @@ export async function runRepairLoop(
 
     const piResult = await runPiRepair(prompt, workdir, attempt, config, logger, signal);
     logger.log(attempt, piResult.exitCode === 0 ? 'INFO' : 'WARN', `Pi exited with code ${piResult.exitCode}`);
+    if (piResult.exitCode !== 0 && piResult.stderr) {
+      logger.log(attempt, 'ERROR', `Pi failure details:\n${piResult.stderr}`);
+    }
 
     if (signal.aborted) {
       logger.log(attempt, 'WARN', 'Repair loop interrupted');
