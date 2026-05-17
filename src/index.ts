@@ -2,7 +2,7 @@
 import { Command } from 'commander';
 import { loadConfig } from './config.js';
 import { Logger } from './logger.js';
-import { validatePi } from './pi.js';
+import { validatePiSdk } from './pi.js';
 import { runRepairLoop } from './repairLoop.js';
 import { validateVerilator } from './verilator.js';
 
@@ -34,8 +34,8 @@ async function main(): Promise<number> {
     logger.log(0, 'INFO', 'Validating Verilator installation');
     await validateVerilator();
 
-    logger.log(0, 'INFO', 'Validating Pi Coding Agent installation');
-    validatePi();
+    logger.log(0, 'INFO', 'Validating Pi Coding Agent SDK');
+    validatePiSdk();
 
     return await runRepairLoop(options.file, config, logger, abortController.signal);
   } catch (error) {

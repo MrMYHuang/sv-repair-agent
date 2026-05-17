@@ -6,9 +6,9 @@ TypeScript CLI for automatic SystemVerilog syntax/lint repair using Verilator an
 
 - Node.js 20+
 - Verilator in `PATH`
-- Pi Coding Agent in `PATH`
+- Pi Coding Agent SDK package
 
-Install Pi:
+The SDK dependency is installed by `npm install`. If you also want the standalone Pi CLI:
 
 ```sh
 npm install -g @earendil-works/pi-coding-agent
@@ -56,10 +56,11 @@ Logs are saved under `logs/run-<timestamp>.log`.
 
 ## Pi Integration
 
-Pi execution is isolated in `src/pi.ts`. The default invocation shape is:
+Pi execution is isolated in `src/pi.ts`. The tool uses the Pi Coding Agent SDK directly:
 
-```sh
-OPENAI_BASE_URL=<url> OPENAI_API_KEY=<key> OPENAI_MODEL=<model> pi "<repair prompt>"
-```
+- `createAgentSession`
+- in-memory auth, settings, and session storage
+- a dynamically registered OpenAI-compatible provider from `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL`
+- built-in Pi coding tools: `read`, `bash`, `edit`, and `write`
 
-If the installed Pi CLI changes its scriptable interface, update only `src/pi.ts`.
+If the SDK integration needs to change, update only `src/pi.ts`.
